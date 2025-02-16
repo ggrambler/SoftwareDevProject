@@ -2,6 +2,8 @@
 
 **VidTeams** is a web application for teams and friends to stream videos and songs together and decide what to play next. Users vote on the next media, with the majority choice winning—unless someone is willing to pay to change the rankings.😊
 
+Project online @: [https://software-dev-project.vercel.app/](https://software-dev-project.vercel.app/)
+
 ---
 
 ## Table of Contents
