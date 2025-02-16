@@ -6,6 +6,7 @@ import Appbar from '@/components/Appbar';
 import EntryBox from '@/components/EntryBox';
 import Queue from '@/components/Queue';
 import VideoContainer from '@/components/Videocont';
+import {config} from '@/components/config';
 
 export interface Video {
   id: string;
@@ -85,7 +86,7 @@ export default function HomeContent() {
 
   // A simple fetch for video metadata (using YouTube Data API)
   const fetchVideoData = async (videoId: string) => {
-    const apiKey = process.env.YOUTUBE_API;
+    const apiKey = config.YOUTUBE_API
     if (!apiKey) {
       console.error("Missing YouTube API key");
       return null;
