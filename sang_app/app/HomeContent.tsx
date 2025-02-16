@@ -6,7 +6,7 @@ import Appbar from '@/components/Appbar';
 import EntryBox from '@/components/EntryBox';
 import Queue from '@/components/Queue';
 import VideoContainer from '@/components/Videocont';
-import {config} from '@/components/config';
+// import {config} from '@/components/config';
 
 export interface Video {
   id: string;
