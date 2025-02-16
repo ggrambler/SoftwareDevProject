@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Video } from '@/app/page';
+import { Video } from '@/app/HomeContent';
 
 interface VideoContainerProps {
   currentVideo: Video | null;
