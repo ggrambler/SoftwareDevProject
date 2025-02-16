@@ -86,7 +86,7 @@ export default function HomeContent() {
 
   // A simple fetch for video metadata (using YouTube Data API)
   const fetchVideoData = async (videoId: string) => {
-    const apiKey = "AIzaSyC4ZRr2azV4svn6TD-KApc1LyZJVcNtdTk"; // YoutubeAPI Key 
+    const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API; 
     if (!apiKey) {
       console.error("Missing YouTube API key");
       return null;
