@@ -33,12 +33,10 @@ export default function HomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Read session code from URL (if available)
   const sessionCodeFromUrl = searchParams.get('session');
   const [sessionCode, setSessionCode] = useState<string>(sessionCodeFromUrl || '');
   const [newSessionCode, setNewSessionCode] = useState<string>('');
 
-  // If no session code exists, generate one and update the URL.
   useEffect(() => {
     if (!sessionCode) {
       const code = generateSessionCode();
@@ -47,12 +45,10 @@ export default function HomeContent() {
     }
   }, [sessionCode, router]);
 
-  // Local state for queue, current video, and the video URL input.
   const [queue, setQueue] = useState<Video[]>([]);
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const [videoUrl, setVideoUrl] = useState('');
 
-  // Function to load the session data (queue and currentVideo) from your backend.
   async function loadSessionQueue(code: string) {
     if (!code) return;
     const res = await fetch(`/api/session/${code}`);
@@ -63,7 +59,6 @@ export default function HomeContent() {
     const data = await res.json();
     if (data) {
       if (data.queue) setQueue(data.queue);
-      // data.currentVideo may be null – update state accordingly.
       setCurrentVideo(data.currentVideo || null);
     }
   }
@@ -75,16 +70,14 @@ export default function HomeContent() {
     }
   }, [sessionCode]);
 
-  // Poll every 3 seconds so that updates show up globally.
   useEffect(() => {
     if (!sessionCode) return;
     const interval = setInterval(() => {
       loadSessionQueue(sessionCode);
-    }, 3000);
+    }, 1500);
     return () => clearInterval(interval);
   }, [sessionCode]);
 
-  // A simple fetch for video metadata (using YouTube Data API)
   const fetchVideoData = async (videoId: string) => {
     const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API; 
     if (!apiKey) {
@@ -154,7 +147,7 @@ export default function HomeContent() {
     setVideoUrl('');
   };
 
-  // Handle voting on a video.
+  
   const handleVote = async (videoId: string, delta: number) => {
     const res = await fetch(`/api/session/${sessionCode}`, {
       method: 'POST',
@@ -172,7 +165,6 @@ export default function HomeContent() {
     }
   };
 
-  // "Play Next" action: ask the server to pick and remove the highest-voted video.
   const playNext = async () => {
     if (queue.length === 0) {
       alert('Queue is empty.');
@@ -194,7 +186,6 @@ export default function HomeContent() {
     }
   };
 
-  // Change session code based on user input.
   const changeSessionCode = () => {
     if (!newSessionCode.trim()) return;
     const code = newSessionCode.trim().toUpperCase();
@@ -209,10 +200,7 @@ export default function HomeContent() {
       <div className="p-5">
         <strong>Session Code:</strong> {sessionCode}
         <div className="mt-2 flex items-center">
-          <input
-            type="text"
-            value={newSessionCode}
-            onChange={(e) => setNewSessionCode(e.target.value)}
+          <input type="text" value={newSessionCode} onChange={(e) => setNewSessionCode(e.target.value)}
             placeholder="Enter new session code"
             className="border border-gray-300 p-2 mr-2 rounded w-40"
           />

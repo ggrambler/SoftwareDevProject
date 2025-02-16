@@ -14,9 +14,25 @@ function Appbar() {
 
   const userName = session?.user?.name || "Guest";
 
+  function generateSessionCode(): string {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const digits = '0123456789';
+    let code = '';
+    for (let i = 0; i < 2; i++) {
+      code += letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+    for (let i = 0; i < 2; i++) {
+      code += digits.charAt(Math.floor(Math.random() * digits.length));
+    }
+    return code;
+  }
+
+  const newScode = generateSessionCode();
+  const routeScode = `/?session=${newScode}`;
+
   return (
     <div className="appbar justify-between items-center bg-zinc-800 p-5 flex w-screen">
-      <Link href="/">
+      <Link href={routeScode}>
       <div className="text-white italic text-3xl font-bold flex items-center">VidTeams
       <Image src={VTicon} alt="VidTeams Logo" width={70} height={70} className="filter invert"/>
       </div>
