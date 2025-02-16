@@ -44,7 +44,9 @@ VidTeams offers a collaborative experience for sharing media. Whether you're hos
 ```
    git clone https://github.com/yourusername/VidTeams.git
 
-   cd VidTeams
+   cd sang_app
+   or
+   cd VidTeams (may change depending on my mood!!)
    
    pnpm install
 
