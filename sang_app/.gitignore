@@ -41,7 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 # config for my google id and secret
-config.tsx
+# config.tsx
 
 node_modules/
 .env
