@@ -10,6 +10,7 @@ interface Video {
 
 interface SessionData {
   queue: Video[];
+  currentVideo: Video | null;
 }
 
 const sessions: Record<string, SessionData> = {};
@@ -23,10 +24,9 @@ export async function GET(
   request: Request,
   context: SessionRouteContext
 ) {
-  // Await the promise for params.
   const { sessionCode } = await context.params;
   if (!sessions[sessionCode]) {
-    sessions[sessionCode] = { queue: [] };
+    sessions[sessionCode] = { queue: [], currentVideo: null };
   }
   return NextResponse.json(sessions[sessionCode]);
 }
@@ -37,7 +37,7 @@ export async function POST(
 ) {
   const { sessionCode } = await context.params;
   if (!sessions[sessionCode]) {
-    sessions[sessionCode] = { queue: [] };
+    sessions[sessionCode] = { queue: [], currentVideo: null };
   }
   const body = await request.json();
   const { action } = body;
@@ -59,6 +59,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
       queue: sessions[sessionCode].queue,
+      currentVideo: sessions[sessionCode].currentVideo,
     });
   }
 
@@ -72,17 +73,29 @@ export async function POST(
     return NextResponse.json({
       success: true,
       queue: sessions[sessionCode].queue,
+      currentVideo: sessions[sessionCode].currentVideo,
     });
   }
 
   if (action === 'play') {
-    const { videoId } = body;
-    sessions[sessionCode].queue = sessions[sessionCode].queue.filter(
-      (video) => video.id !== videoId
-    );
+    // Instead of using a provided videoId,
+    // compute the highest-voted video on the server.
+    if (sessions[sessionCode].queue.length === 0) {
+      sessions[sessionCode].currentVideo = null;
+    } else {
+      const sortedQueue = [...sessions[sessionCode].queue].sort(
+        (a, b) => b.votes - a.votes
+      );
+      const nextVideo = sortedQueue[0];
+      sessions[sessionCode].currentVideo = nextVideo;
+      sessions[sessionCode].queue = sessions[sessionCode].queue.filter(
+        (video) => video.id !== nextVideo.id
+      );
+    }
     return NextResponse.json({
       success: true,
       queue: sessions[sessionCode].queue,
+      currentVideo: sessions[sessionCode].currentVideo,
     });
   }
 

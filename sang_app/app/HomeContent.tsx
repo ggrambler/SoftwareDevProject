@@ -51,21 +51,23 @@ export default function HomeContent() {
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const [videoUrl, setVideoUrl] = useState('');
 
-  // Function to load the session queue from your backend.
+  // Function to load the session data (queue and currentVideo) from your backend.
   async function loadSessionQueue(code: string) {
     if (!code) return;
     const res = await fetch(`/api/session/${code}`);
     if (!res.ok) {
-      console.error('Failed to load session queue');
+      console.error('Failed to load session data');
       return;
     }
     const data = await res.json();
-    if (data?.queue) {
-      setQueue(data.queue);
+    if (data) {
+      if (data.queue) setQueue(data.queue);
+      // data.currentVideo may be null – update state accordingly.
+      setCurrentVideo(data.currentVideo || null);
     }
   }
 
-  // Load the session queue on initial mount and when sessionCode changes.
+  // Load session data on mount and whenever sessionCode changes.
   useEffect(() => {
     if (sessionCode) {
       loadSessionQueue(sessionCode);
@@ -81,12 +83,29 @@ export default function HomeContent() {
     return () => clearInterval(interval);
   }, [sessionCode]);
 
-  // A simple fetch for video metadata (placeholder).
+  // A simple fetch for video metadata (using YouTube Data API)
   const fetchVideoData = async (videoId: string) => {
-    return {
-      title: `Video Title for ${videoId}`,
-      thumbnail: `https://img.youtube.com/vi/${videoId}/0.jpg`,
-    };
+    const apiKey = process.env.YOUTUBE_API;
+    if (!apiKey) {
+      console.error("Missing YouTube API key");
+      return null;
+    }
+    const res = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`
+    );
+    if (!res.ok) {
+      console.error("Failed to fetch video data");
+      return null;
+    }
+    const data = await res.json();
+    if (data.items && data.items.length > 0) {
+      const snippet = data.items[0].snippet;
+      return {
+        title: snippet.title,
+        thumbnail: snippet.thumbnails?.default?.url || `https://img.youtube.com/vi/${videoId}/0.jpg`,
+      };
+    }
+    return null;
   };
 
   // Add video to the queue with a duplicate check.
@@ -127,8 +146,9 @@ export default function HomeContent() {
       return;
     }
     const data = await res.json();
-    if (data?.queue) {
-      setQueue(data.queue);
+    if (data) {
+      if (data.queue) setQueue(data.queue);
+      setCurrentVideo(data.currentVideo || null);
     }
     setVideoUrl('');
   };
@@ -145,32 +165,31 @@ export default function HomeContent() {
       return;
     }
     const data = await res.json();
-    if (data?.queue) {
-      setQueue(data.queue);
+    if (data) {
+      if (data.queue) setQueue(data.queue);
+      setCurrentVideo(data.currentVideo || null);
     }
   };
 
-  // "Play Next" action: remove the highest-voted video.
+  // "Play Next" action: ask the server to pick and remove the highest-voted video.
   const playNext = async () => {
     if (queue.length === 0) {
       alert('Queue is empty.');
       return;
     }
-    const sortedQueue = [...queue].sort((a, b) => b.votes - a.votes);
-    const nextVideo = sortedQueue[0];
-    setCurrentVideo(nextVideo);
     const res = await fetch(`/api/session/${sessionCode}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'play', videoId: nextVideo.id }),
+      body: JSON.stringify({ action: 'play' }),
     });
     if (!res.ok) {
-      alert('Failed to update queue on server.');
+      alert('Failed to update session on server.');
       return;
     }
     const data = await res.json();
-    if (data?.queue) {
-      setQueue(data.queue);
+    if (data) {
+      if (data.queue) setQueue(data.queue);
+      setCurrentVideo(data.currentVideo || null);
     }
   };
 
