@@ -43,6 +43,24 @@ VidTeams offers a collaborative experience for sharing media. Whether you're hos
 1. **Clone the Repository:**
 ```
    git clone https://github.com/yourusername/VidTeams.git
+
+   cd VidTeams
+   
+   pnpm install
+
+   pnpm start 
+   or
+
+   pnpm run dev
+
+   if dev command exists in package.json
+   "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+
 ```
 
 
