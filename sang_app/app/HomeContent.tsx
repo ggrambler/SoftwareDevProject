@@ -74,7 +74,7 @@ export default function HomeContent() {
     if (!sessionCode) return;
     const interval = setInterval(() => {
       loadSessionQueue(sessionCode);
-    }, 1500);
+    }, 2500);
     return () => clearInterval(interval);
   }, [sessionCode]);
 
